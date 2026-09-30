@@ -1,60 +1,120 @@
+import asyncio
 import streamlit as st
 
-from llm import ask_llm
+from orchestrator import ask_assistant
 
 
 st.set_page_config(
     page_title="AI Knowledge Assistant",
-    page_icon="🤖"
+    page_icon="🤖",
+    layout="wide"
 )
+
 
 st.title("🤖 AI Knowledge Assistant")
 
-st.write(
-    "LLM + Conversation History"
+st.caption(
+    "Ask questions about company policies "
+    "or your employee information."
 )
 
 
-# Initialize conversation history
+# -----------------------------------------
+# Session state
+# -----------------------------------------
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display previous messages
+
+# -----------------------------------------
+# Sidebar
+# -----------------------------------------
+
+with st.sidebar:
+
+    st.header("Employee")
+
+    employee_id = st.text_input(
+        "Employee ID",
+        value="EMP001"
+    )
+
+    if st.button("Clear Conversation"):
+
+        st.session_state.messages = []
+
+        st.rerun()
+
+
+# -----------------------------------------
+# Display conversation
+# -----------------------------------------
+
 for message in st.session_state.messages:
 
     with st.chat_message(message["role"]):
+
         st.markdown(message["content"])
 
-# Get new user message
-if prompt := st.chat_input("Ask a question"):
 
-    # Store user message
-    st.session_state.messages.append({
-        "role": "user",
-        "content": prompt
-    })
+# -----------------------------------------
+# User input
+# -----------------------------------------
+
+question = st.chat_input(
+    "Ask a question..."
+)
+
+
+if question:
 
     # Display user message
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    st.session_state.messages.append({
+        "role": "user",
+        "content": question
+    })
 
-    # Generate response
+    with st.chat_message("user"):
+        st.markdown(question)
+
+
+    # -------------------------------------
+    # Call orchestrator
+    # -------------------------------------
+
     with st.chat_message("assistant"):
 
         with st.spinner("Thinking..."):
 
-            answer = ask_llm(
-                st.session_state.messages
-            )
+            try:
 
-        st.markdown(answer)
+                result = asyncio.run(
+                    ask_assistant(
+                        question=question,
+                        employee_id=employee_id
+                    )
+                )
 
-    # Store assistant response
+                answer = result["answer"]
+
+                st.markdown(answer)
+
+            except Exception as exc:
+
+                answer = (
+                    "Sorry, I couldn't process "
+                    "your request."
+                )
+
+                st.error(answer)
+
+                # For development only
+                st.exception(exc)
+
+
+    # Save assistant response
     st.session_state.messages.append({
         "role": "assistant",
         "content": answer
     })
-    
-if st.button("Clear Chat"):
-    st.session_state.messages = []
-    st.rerun()
