@@ -506,39 +506,6 @@ This project provides hands-on experience with:
 -   Security
 -   Observability
 
-## Project Status
-
-### Completed
-
--   [x] PDF loading
--   [x] Text chunking
--   [x] OpenAI embeddings
--   [x] ChromaDB vector storage
--   [x] Semantic retrieval
--   [x] Source metadata
--   [x] Similarity filtering
--   [x] RAG generation
--   [x] MCP server
--   [x] MCP client
--   [x] MCP tool discovery
--   [x] MCP tool execution
--   [x] LLM + MCP tool calling
--   [x] RAG + MCP orchestration
--   [x] Streamlit integration
-
-### Next
-
--   [ ] Production-oriented configuration
--   [ ] Structured result models
--   [ ] Centralized LLM client
--   [ ] Logging and observability
--   [ ] Unit and integration tests
--   [ ] RAG evaluation
--   [ ] Tool authorization
--   [ ] Better conversation memory
--   [ ] FastAPI backend
--   [ ] Docker deployment
-
 ## Key Design Principle
 
 > **The UI should not contain AI business logic.**
